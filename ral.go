@@ -4,9 +4,11 @@ package ral
 
 import (
 	"net/http"
-	"fmt"
 	"strings"
+	"fmt"
+	"net/url"
 	"io/ioutil"
+	"time"
 )
 
 // Defines the user agent projected by the package
@@ -20,17 +22,18 @@ const (
 
 // Defines site-wide parameters for accessing information from RAL
 type Site struct {
-	Endpoint string
+	URL url.URL
 	Timeout int
 	UserAgent string
 }
 
 // Defines a single request to the RAL API
 type APIRequest struct {
-	Action APIAction
-	Endpoint string
+	URL url.URL
+	// Action APIAction
+	// Endpoint string
 	UserAgent string
-	Parameters map[string]string
+	// Parameters map[string]string
 	Client http.Client
 }
 
@@ -43,21 +46,39 @@ func New() (Site) {
 
 // Serialize the API request into a URI
 func (a APIRequest) URI() (string) {
-	var sb strings.Builder
-	sb.WriteString(a.Endpoint)
-	sb.WriteString("?a=")
-	sb.WriteString(string(a.Action))
-	for key, val := range a.Parameters {
-		sb.WriteString(key)
-		sb.WriteString("=")
-		sb.WriteString(val)
-	}
-	fmt.Printf(sb.String())
-	return sb.String()
+	return a.URL.String()
 }
+
+// Generates a single request for information on the given site, representing
+// exactly one transaction / HTTP request
+func (s Site) APIRequest(action APIAction, params map[string]string) (a APIRequest) {
+	var querySlice []string
+	for key, val := range params {
+		querySlice = append(querySlice,
+			strings.Join([]string{key, val}, "="))
+	}
+	querySlice = append(querySlice,
+		strings.Join([]string{"a", string(action)}, "="))
+	rawQuery := strings.Join(querySlice, "&")
+
+	a.URL = url.URL{
+		Scheme: s.URL.Scheme,
+		User: s.URL.User,
+		Host: s.URL.Host,
+		Path: s.URL.Path,
+		RawQuery: rawQuery}
+	a.UserAgent = s.UserAgent
+	a.Client = http.Client{
+		Timeout: (time.Second * time.Duration(s.Timeout))}
+	return
+}
+
+// Some day... do the heavy lifting done in APIRequest.URI()
+// func CreateQueryString(params map[string]string) string { }
 
 // Execute a single request to the RAL API
 func (areq APIRequest) Go() (body []byte, err error) {
+	fmt.Println(areq.URI())
 	req, err := http.NewRequest(http.MethodGet, areq.URI(), nil)
 	if err != nil { return }
 

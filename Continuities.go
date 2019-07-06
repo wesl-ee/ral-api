@@ -1,9 +1,7 @@
 package ral
 
 import (
-	"net/http"
 	"encoding/json"
-	"time"
 )
 
 // Continuities represent discussion topics like "Anime" or "Music"
@@ -17,12 +15,8 @@ type Continuity struct {
 // Generate and execute an API request which returns the full list of
 // Continuities on the given Site
 func (s Site) Continuities() (ret ContinuityList, err error) {
-	areq := APIRequest{
-		Action: View,
-		UserAgent: s.UserAgent,
-		Endpoint: s.Endpoint,
-		Client: http.Client{
-			Timeout: (time.Second * time.Duration(s.Timeout))} }
+	params := map[string]string{}
+	areq := s.APIRequest(View, params)
 
 	body, err := areq.Go()
 	if err != nil { return }
