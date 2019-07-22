@@ -26,12 +26,6 @@ type Site struct {
 	UserAgent string
 }
 
-// Describes an output format
-type Format int
-const (
-	FormatSimple Format = iota
-	FormatJson )
-
 // Defines a single request to the RAL API
 type APIRequest struct {
 	URL url.URL

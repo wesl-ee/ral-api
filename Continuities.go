@@ -2,7 +2,6 @@ package ral
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 // Continuities represent discussion topics like "Anime" or "Music"
@@ -27,14 +26,3 @@ func (s Site) Continuities() (ret ContinuityList, err error) {
 
 	return
 }
-
-// Serialize to console
-func (cl ContinuityList) Print(f Format) {
-	switch(f) {
-	case FormatSimple:
-		for i, c := range cl {
-			fmt.Printf("%d. [%s]\n", i+1, c.Name)
-			fmt.Printf("    %s\n", c.Description)
-			fmt.Printf("    %d posts\n", c.PostCount)
-		}
-	} }
