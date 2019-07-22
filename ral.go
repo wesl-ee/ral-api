@@ -5,7 +5,6 @@ package ral
 import (
 	"net/http"
 	"strings"
-	"fmt"
 	"net/url"
 	"io/ioutil"
 	"time"
@@ -26,6 +25,12 @@ type Site struct {
 	Timeout int
 	UserAgent string
 }
+
+// Describes an output format
+type Format int
+const (
+	FormatSimple Format = iota
+	FormatJson )
 
 // Defines a single request to the RAL API
 type APIRequest struct {
@@ -78,7 +83,6 @@ func (s Site) APIRequest(action APIAction, params map[string]string) (a APIReque
 
 // Execute a single request to the RAL API
 func (areq APIRequest) Go() (body []byte, err error) {
-	fmt.Println(areq.URI())
 	req, err := http.NewRequest(http.MethodGet, areq.URI(), nil)
 	if err != nil { return }
 

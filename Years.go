@@ -2,6 +2,7 @@ package ral
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 // Years are subsets of Continuities; they represent all Topics posted
@@ -26,3 +27,13 @@ func (s Site) Years(continuity string) (ret YearList, err error) {
 	err = json.Unmarshal(body, &ret)
 	return
 }
+
+// Serialize to console
+func (yl YearList) Print(f Format) {
+	switch(f) {
+	case FormatSimple:
+		for i, y := range yl {
+			fmt.Printf("%d. [%s/%d]\n", i+1, y.Continuity, y.Year)
+			fmt.Printf("    %d posts\n", y.Count)
+		}
+	} }
