@@ -35,6 +35,29 @@ The RAL software exposes a web API at `/api`
 which this library uses to fetch posts and information from any site running
 RAL.
 
+Installation
+------------
+
+If you are using any derivative software which leverages this package, a `go
+get` will pull in my package automaticaly so there is no need to install
+this repository explicity. Furthermore this package has no binaries (if you
+thought it did you might be looking for my
+[RalEExplorer](https://github.com/wesleycoakley/raleexplorer) or [RAL (CLI
+Tool)](https://github.com/wesleycoakley/ral) packages) so you shouldn't `go
+get` this if you are expecting an executable.
+
+However if you are building a totally new application then feel free to pull
+this one using:
+
+```
+go get github.com/wesleycoakley/ral-api
+```
+
+You don't need to worry about dependencies but if you are curious:
+
+- Go standard library
+- Eidolon's ultra-simple [word-wrapping library](https://github.com/eidolon/wordwrap)
+
 Contributing
 ------------
 
