@@ -2,7 +2,10 @@ package ral
 
 import (
 	"fmt"
+	"strconv"
+	"encoding/csv"
 	"encoding/json"
+	"os"
 
 	"github.com/eidolon/wordwrap"
 )
@@ -11,11 +14,22 @@ import (
 type Format int
 const (
 	FormatSimple Format = iota
+	FormatCSV
 	FormatJson )
 
 // Serialize ContinuityList to console
 func (cl ContinuityList) Print(f Format) {
 	switch(f) {
+	case FormatCSV:
+		// buf := bytes.Buffer{}
+		writer := csv.NewWriter(os.Stdout)
+		for _, c := range cl {
+			writer.Write([]string{
+				c.Name,
+				c.Description,
+				strconv.Itoa(c.PostCount) })
+		}
+		writer.Flush()
 	case FormatSimple:
 		for i, c := range cl {
 			fmt.Printf("%d. [%s]\n", i+1, c.Name)
