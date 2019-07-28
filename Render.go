@@ -3,6 +3,7 @@ package ral
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"encoding/csv"
 	"encoding/json"
 	"os"
@@ -15,13 +16,28 @@ type Format int
 const (
 	FormatSimple Format = iota
 	FormatCSV
+	FormatArray
 	FormatJson )
+
+// Surround string with single quotes
+func QuoteSingle(s string) (string) {
+	return strings.Join([]string{"'", s, "'"}, "") }
+
+// Escape single quotes in a string
+func EscapeSingle(s string) (string) {
+	return strings.ReplaceAll(s, "'", "\\'") }
 
 // Serialize ContinuityList to console
 func (cl ContinuityList) Print(f Format) {
 	switch(f) {
+	case FormatArray:
+		for _, c := range cl {
+			fmt.Printf("(%s %s %d)\n",
+				QuoteSingle(EscapeSingle(c.Name)),
+				QuoteSingle(EscapeSingle(c.Description)),
+				c.PostCount)
+		}
 	case FormatCSV:
-		// buf := bytes.Buffer{}
 		writer := csv.NewWriter(os.Stdout)
 		for _, c := range cl {
 			writer.Write([]string{
