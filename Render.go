@@ -62,6 +62,26 @@ func (cl ContinuityList) Print(f Format) {
 		fmt.Println(string(c))
 	} }
 
+// Serialize ReplyList to console
+func (rl ReplyList) Print(f Format) {
+	switch(f) {
+	case FormatJson:
+		r, err := json.Marshal(rl)
+		if err != nil { panic(err) }
+		fmt.Println(string(r))
+	case FormatSimple:
+		for _, r := range rl {
+			fmt.Printf("[%s/%d/%d/%d] (%s)\n",
+				r.Continuity,
+				r.Year,
+				r.Topic,
+				r.Id,
+				r.Created)
+
+			wrapper := wordwrap.Wrapper(76, false)
+			fmt.Printf("%s\n", wordwrap.Indent(wrapper(r.Content), "    ", true))
+		} } }
+
 // Serialize TopicList to console
 func (tl TopicList) Print(f Format) {
 	switch(f) {
