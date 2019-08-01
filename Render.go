@@ -15,7 +15,6 @@ import (
 type Format int
 const (
 	FormatSimple Format = iota
-	FormatSimpleNoWrap
 	FormatCSV
 	FormatJson )
 
@@ -56,15 +55,14 @@ func (cl ContinuityList) Print(f Format) {
 	} }
 
 // Serialize ReplyList to console
-func (rl ReplyList) Print(f Format) {
+func (rl ReplyList) Print(f Format, wrap int) {
 	switch(f) {
 	case FormatJson:
 		r, err := json.Marshal(rl)
 		if err != nil { panic(err) }
 		fmt.Println(string(r))
-	case FormatSimpleNoWrap:
-		fallthrough
 	case FormatSimple:
+		indentation := "    "
 		for _, r := range rl {
 			fmt.Printf("[%s/%d/%d/%d] (%s)\n",
 				r.Continuity,
@@ -73,15 +71,15 @@ func (rl ReplyList) Print(f Format) {
 				r.Id,
 				r.Created)
 
-			if f == FormatSimpleNoWrap {
-				fmt.Printf("%s\n", wordwrap.Indent(r.Content, "    ", true))
+			if wrap > 0 {
+				wrapper := wordwrap.Wrapper(wrap - len(indentation), false)
+				fmt.Printf("%s\n", wordwrap.Indent(wrapper(r.Content), indentation, true))
 			} else {
-				wrapper := wordwrap.Wrapper(76, false)
-				fmt.Printf("%s\n", wordwrap.Indent(wrapper(r.Content), "    ", true))
+				fmt.Printf("%s\n", wordwrap.Indent(r.Content, indentation, true))
 			} } } }
 
 // Serialize TopicList to console
-func (tl TopicList) Print(f Format) {
+func (tl TopicList) Print(f Format, wrap int) {
 	switch(f) {
 	case FormatCSV:
 		writer := csv.NewWriter(os.Stdout)
@@ -94,9 +92,8 @@ func (tl TopicList) Print(f Format) {
 				strconv.Itoa(t.Replies),
 				t.Content }) }
 		writer.Flush()
-	case FormatSimpleNoWrap:
-			fallthrough
 	case FormatSimple:
+		indentation := "    "
 		for _, t := range tl {
 			fmt.Printf("[%s/%d/%d] (%s) (%d replies)\n",
 				t.Continuity,
@@ -105,11 +102,11 @@ func (tl TopicList) Print(f Format) {
 				t.Created,
 				t.Replies)
 
-			if f == FormatSimpleNoWrap {
-				fmt.Printf("%s\n", wordwrap.Indent(t.Content, "    ", true))
-			} else {
-				wrapper := wordwrap.Wrapper(76, false)
+			if wrap > 0 {
+				wrapper := wordwrap.Wrapper(wrap - len(indentation), false)
 				fmt.Printf("%s\n", wordwrap.Indent(wrapper(t.Content), "    ", true))
+			} else {
+				fmt.Printf("%s\n", wordwrap.Indent(t.Content, indentation, true))
 			} }
 	case FormatJson:
 		t, err := json.Marshal(tl)
