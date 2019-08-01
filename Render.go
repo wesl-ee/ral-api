@@ -17,7 +17,6 @@ const (
 	FormatSimple Format = iota
 	FormatSimpleNoWrap
 	FormatCSV
-	FormatShArray
 	FormatJson )
 
 // Surround string with single quotes
@@ -35,13 +34,6 @@ func ShQuote(s string) (string) {
 // Serialize ContinuityList to console
 func (cl ContinuityList) Print(f Format) {
 	switch(f) {
-	case FormatShArray:
-		for _, c := range cl {
-			fmt.Printf("(%s %s %d)\n",
-				ShQuote(c.Name),
-				ShQuote(c.Description),
-				c.PostCount)
-		}
 	case FormatCSV:
 		writer := csv.NewWriter(os.Stdout)
 		for _, c := range cl {
@@ -70,6 +62,8 @@ func (rl ReplyList) Print(f Format) {
 		r, err := json.Marshal(rl)
 		if err != nil { panic(err) }
 		fmt.Println(string(r))
+	case FormatSimpleNoWrap:
+		fallthrough
 	case FormatSimple:
 		for _, r := range rl {
 			fmt.Printf("[%s/%d/%d/%d] (%s)\n",
@@ -89,16 +83,6 @@ func (rl ReplyList) Print(f Format) {
 // Serialize TopicList to console
 func (tl TopicList) Print(f Format) {
 	switch(f) {
-	case FormatShArray:
-		for _, t := range tl {
-			fmt.Printf("(%s %d %d %s %d %s)\n",
-				ShQuote(t.Continuity),
-				t.Year,
-				t.Topic,
-				ShQuote(t.Created),
-				t.Replies,
-				ShQuote(t.Content))
-		}
 	case FormatCSV:
 		writer := csv.NewWriter(os.Stdout)
 		for _, t := range tl {
@@ -136,13 +120,6 @@ func (tl TopicList) Print(f Format) {
 // Serialize YearList to console
 func (yl YearList) Print(f Format) {
 	switch(f) {
-	case FormatShArray:
-		for _, y := range yl {
-			fmt.Printf("(%s %d %d)\n",
-				ShQuote(y.Continuity),
-				y.Year,
-				y.Count)
-		}
 	case FormatCSV:
 		writer := csv.NewWriter(os.Stdout)
 		for _, y := range yl {
