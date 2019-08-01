@@ -15,6 +15,7 @@ import (
 type Format int
 const (
 	FormatSimple Format = iota
+	FormatSimpleNoWrap
 	FormatCSV
 	FormatShArray
 	FormatJson )
@@ -78,9 +79,12 @@ func (rl ReplyList) Print(f Format) {
 				r.Id,
 				r.Created)
 
-			wrapper := wordwrap.Wrapper(76, false)
-			fmt.Printf("%s\n", wordwrap.Indent(wrapper(r.Content), "    ", true))
-		} } }
+			if f == FormatSimpleNoWrap {
+				fmt.Printf("%s\n", wordwrap.Indent(r.Content, "    ", true))
+			} else {
+				wrapper := wordwrap.Wrapper(76, false)
+				fmt.Printf("%s\n", wordwrap.Indent(wrapper(r.Content), "    ", true))
+			} } } }
 
 // Serialize TopicList to console
 func (tl TopicList) Print(f Format) {
@@ -104,9 +108,10 @@ func (tl TopicList) Print(f Format) {
 				strconv.Itoa(t.Topic),
 				t.Created,
 				strconv.Itoa(t.Replies),
-				t.Content })
-		}
+				t.Content }) }
 		writer.Flush()
+	case FormatSimpleNoWrap:
+			fallthrough
 	case FormatSimple:
 		for _, t := range tl {
 			fmt.Printf("[%s/%d/%d] (%s) (%d replies)\n",
@@ -116,9 +121,12 @@ func (tl TopicList) Print(f Format) {
 				t.Created,
 				t.Replies)
 
-			wrapper := wordwrap.Wrapper(76, false)
-			fmt.Printf("%s\n", wordwrap.Indent(wrapper(t.Content), "    ", true))
-		}
+			if f == FormatSimpleNoWrap {
+				fmt.Printf("%s\n", wordwrap.Indent(t.Content, "    ", true))
+			} else {
+				wrapper := wordwrap.Wrapper(76, false)
+				fmt.Printf("%s\n", wordwrap.Indent(wrapper(t.Content), "    ", true))
+			} }
 	case FormatJson:
 		t, err := json.Marshal(tl)
 		if err != nil { panic(err) }
